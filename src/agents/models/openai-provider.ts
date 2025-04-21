@@ -1,4 +1,4 @@
-import { OpenAI } from 'openai';
+import { OpenAI, AzureOpenAI } from 'openai';
 import { Model, ModelProvider } from './interface';
 import { OpenAIChatCompletionsModel } from './openai-chatcompletions';
 import { OpenAIResponsesModel } from './openai-responses';
@@ -11,6 +11,7 @@ import {
 import { AllModels } from 'openai/resources/shared';
 
 export const DEFAULT_MODEL: AllModels = 'gpt-4o';
+const USE_AZURE = false;
 
 /**
  * Provider for OpenAI models.
@@ -87,17 +88,34 @@ export class OpenAIProvider implements ModelProvider {
         if (!apiKey) {
           throw new Error('OpenAI API key is required');
         }
-        this._client = new OpenAI({
-          apiKey,
-          baseURL: this._storedBaseUrl || undefined,
-          organization: this._storedOrganization || undefined,
-          project: this._storedProject || undefined,
-          defaultHeaders: {
-            'Content-Type': 'application/json',
-          },
-          defaultQuery: {},
-          maxRetries: 3,
-        });
+        if (USE_AZURE) {
+          this._client = new AzureOpenAI({
+            // apiKey,
+            // baseURL: this._storedBaseUrl || undefined,
+            apiKey: process.env.AZURE_OPENAI_API_KEY,
+            endpoint: process.env.AZURE_OPENAI_ENDPOINT,
+            apiVersion: "2025-03-01-preview",
+            organization: this._storedOrganization || undefined,
+            project: this._storedProject || undefined,
+            defaultHeaders: {
+              'Content-Type': 'application/json',
+            },
+            defaultQuery: {},
+            maxRetries: 3,
+          });
+        } else {
+          this._client = new OpenAI({
+            apiKey,
+            baseURL: this._storedBaseUrl || undefined,
+            organization: this._storedOrganization || undefined,
+            project: this._storedProject || undefined,
+            defaultHeaders: {
+              'Content-Type': 'application/json',
+            },
+            defaultQuery: {},
+            maxRetries: 3,
+          });
+        }
       }
     }
     return this._client;

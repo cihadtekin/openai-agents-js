@@ -247,11 +247,11 @@ export class OpenAIResponsesModel implements Model {
         },
       };
 
-      const output: TResponseOutputItem[] = [];
+      let output: TResponseOutputItem[] = [];
       const content = response.output;
 
       if (content) {
-        output.push(ItemHelpers.inputToNewInputList(content)[0]);
+        output = [...ItemHelpers.inputToNewInputList(content)];
       }
 
       return new ModelResponse(output, usage, response.id);
@@ -338,8 +338,6 @@ export class OpenAIResponsesModel implements Model {
       store: modelSettings.store ?? undefined,
       reasoning: modelSettings.reasoning ?? null,
     };
-
-    // console.log('----PARAMA SOKARIm\n\n', params, '\n\n----');
 
     return this.client.responses.create(params);
   }
