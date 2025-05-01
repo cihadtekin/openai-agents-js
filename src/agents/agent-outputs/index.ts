@@ -171,6 +171,7 @@ export class AgentOutputSchema<T = any> {
    * Generate a JSON schema for the given type.
    */
   private generateJsonSchema(type: any): Record<string, any> {
+    return type;
     if (type._def?.typeName === 'ZodString') {
       return { type: 'string' };
     } else if (type._def?.typeName === 'ZodNumber') {
